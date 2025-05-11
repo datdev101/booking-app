@@ -1,11 +1,24 @@
 {
   "name": "booking-app",
   "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "description": "",
   "author": "",
-  "license": "ISC",
-  "description": ""
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "postinstall": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "@digitalroute/cz-conventional-changelog-for-jira": "^8.0.1",
+    "commitizen": "^4.3.1",
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@types/node": "^20.3.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./.cz-config.cjs"
+    }
+  }
 }
