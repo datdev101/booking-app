@@ -4,7 +4,10 @@ import { ClassConstructor, plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import { AppConfigService } from './app-config.service';
 
-@Module({})
+@Module({
+  providers: [AppConfigService],
+  exports: [AppConfigService],
+})
 export class AppConfigModule {
   static register(option: {
     path: string;

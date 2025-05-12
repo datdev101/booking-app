@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { join } from 'path';
 
 import { EnvVar } from './config/env';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { EnvVar } from './config/env';
       path: join(process.cwd(), 'apps/api-gateway/.env'),
       cls: EnvVar,
     }),
+    AuthModule,
   ],
 })
 export class ApiGatewayModule {}
