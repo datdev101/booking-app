@@ -1,25 +1,10 @@
 import { plainToInstance } from 'class-transformer';
-import {
-  IsEnum,
-  IsNumber,
-  IsString,
-  Max,
-  Min,
-  validateSync,
-} from 'class-validator';
+import { IsEnum, IsInt, IsString, validateSync } from 'class-validator';
 import { Environment } from './app-config.constant';
 
 export class EnvironmentVariables {
   @IsEnum(Environment)
   APP_ENV: Environment;
-
-  @IsNumber()
-  @Min(0)
-  @Max(65535)
-  APP_PORT: number;
-
-  @IsString()
-  APP_PREFIX: string;
 
   @IsString()
   RABBIT_MQ_URI: string;
@@ -28,7 +13,13 @@ export class EnvironmentVariables {
   RABBIT_MQ_AUTH_QUEUE: string;
 
   @IsString()
-  RABBIT_MQ_EVENT_QUEUE: string;
+  MONGODB_URI: string;
+
+  @IsInt()
+  JWT_EXPIRE: number;
+
+  @IsString()
+  JWT_SECRET: string;
 }
 
 export function validate(config: Record<string, unknown>) {

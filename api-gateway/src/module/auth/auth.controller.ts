@@ -4,6 +4,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { sendEvent } from 'src/core/common/helper';
 import { AUTH_MSG_PATTERN, AuthService, Public } from './auth.constant';
+import { IRegisterUser } from './interfaces/register-user.interface';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -14,7 +15,7 @@ export class AuthController {
   @ApiOkResponse()
   @Public()
   async register(@Body() payload: unknown) {
-    return sendEvent<{ code: number; msg: string }>(
+    return sendEvent<IRegisterUser>(
       this.authService,
       AUTH_MSG_PATTERN.REGISTER,
       payload,
