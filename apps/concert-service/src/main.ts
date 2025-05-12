@@ -1,8 +1,13 @@
+import { RabbitmqService } from '@app/rabbitmq';
 import { NestFactory } from '@nestjs/core';
-import { ConcertServiceModule } from './concert-service.module';
+import { ConcertModule } from './concert.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(ConcertServiceModule);
-  await app.listen(process.env.port ?? 3000);
+  const app = await NestFactory.create(ConcertModule);
+  const queueService = app.get(RabbitmqService);
+
+  app.connectMicroservice(queueService.getOptions('concert'));
+  await app.startAllMicroservices();
 }
+
 bootstrap();

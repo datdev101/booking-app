@@ -1,8 +1,12 @@
+import { RabbitmqService } from '@app/rabbitmq';
 import { NestFactory } from '@nestjs/core';
-import { BookingServiceModule } from './booking-service.module';
+import { BookingModule } from './booking.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(BookingServiceModule);
-  await app.listen(process.env.port ?? 3000);
+  const app = await NestFactory.create(BookingModule);
+  const queueService = app.get(RabbitmqService);
+
+  app.connectMicroservice(queueService.getOptions('booking'));
+  await app.startAllMicroservices();
 }
 bootstrap();
