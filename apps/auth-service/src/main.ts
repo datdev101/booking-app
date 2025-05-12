@@ -1,11 +1,11 @@
 import { AppConfigService } from '@app/app-config';
 import { RabbitmqService } from '@app/rabbitmq';
 import { NestFactory } from '@nestjs/core';
-import { AuthServiceModule } from './auth-service.module';
+import { AuthModule } from './auth.module';
 import { EnvVar } from './config/env';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AuthServiceModule);
+  const app = await NestFactory.create(AuthModule);
   const queueService = app.get(RabbitmqService);
   const appConfig = app.get(AppConfigService<EnvVar>);
 

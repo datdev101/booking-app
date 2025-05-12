@@ -36,6 +36,12 @@
       "@app/database/*": [
         "libs/database/src/*"
       ],
+      "@app/mongoose": [
+        "libs/mongoose/src"
+      ],
+      "@app/mongoose/*": [
+        "libs/mongoose/src/*"
+      ],
       "@app/rabbitmq": [
         "libs/rabbitmq/src"
       ],

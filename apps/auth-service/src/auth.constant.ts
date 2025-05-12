@@ -1,7 +1,5 @@
 import { IPattern } from '@app/common';
 
-export const AuthService = 'AuthService';
-
 export const AUTH_MSG_PATTERN = {
   REGISTER: {
     cmd: 'register',
