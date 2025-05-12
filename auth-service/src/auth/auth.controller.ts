@@ -11,4 +11,20 @@ export class AuthController {
   register(@Payload() payload: { email: string; password: string }) {
     return this.authService.register(payload);
   }
+
+  @MessagePattern(AUTH_MSG_PATTERN.LOGIN)
+  async login(
+    @Payload() payload: { email: string; password: string },
+  ): Promise<{ code: number; msg: string; data: { token: string } }> {
+    return {
+      code: 200,
+      msg: 'Login success',
+      data: await this.authService.login(payload),
+    };
+  }
+
+  @MessagePattern(AUTH_MSG_PATTERN.VERIFY_TOKEN)
+  verifyToken(@Payload() payload: { token: string }) {
+    return this.authService.validateToken(payload.token);
+  }
 }

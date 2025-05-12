@@ -9,6 +9,7 @@ import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AppConfigService } from './core/app-config/app-config.service';
 import { AllExceptionsFilter } from './core/handler/error/error.handler';
+import { AuthGuard } from './module/auth/auth.guard';
 
 export function setAppPrefix(app: INestApplication) {
   app.setGlobalPrefix(app.get(AppConfigService).app.prefix);
@@ -19,6 +20,7 @@ export function setAppPrefix(app: INestApplication) {
 
 export function applyAppConfig(app: INestApplication) {
   app.use(cookieParser());
+  app.useGlobalGuards(app.get(AuthGuard));
   app.use(
     helmet({
       hidePoweredBy: true,

@@ -1,5 +1,5 @@
 import { plainToInstance } from 'class-transformer';
-import { IsEnum, IsString, validateSync } from 'class-validator';
+import { IsEnum, IsInt, IsString, validateSync } from 'class-validator';
 import { Environment } from './app-config.constant';
 
 export class EnvironmentVariables {
@@ -14,6 +14,12 @@ export class EnvironmentVariables {
 
   @IsString()
   MONGODB_URI: string;
+
+  @IsInt()
+  JWT_EXPIRE: number;
+
+  @IsString()
+  JWT_SECRET: string;
 }
 
 export function validate(config: Record<string, unknown>) {

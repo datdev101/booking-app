@@ -34,4 +34,11 @@ export class AppConfigService {
       },
     };
   }
+
+  get jwt() {
+    return {
+      secret: this.getKey('JWT_SECRET'),
+      expire: this.getKey('JWT_EXPIRE'),
+    };
+  }
 }

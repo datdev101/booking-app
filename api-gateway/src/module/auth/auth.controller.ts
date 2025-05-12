@@ -1,8 +1,9 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Res } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 import { sendEvent } from 'src/core/common/helper';
-import { AUTH_MSG_PATTERN, AuthService } from './auth.constant';
+import { AUTH_MSG_PATTERN, AuthService, Public } from './auth.constant';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -11,6 +12,7 @@ export class AuthController {
 
   @Post('register')
   @ApiOkResponse()
+  @Public()
   async register(@Body() payload: unknown) {
     return sendEvent<{ code: number; msg: string }>(
       this.authService,
@@ -21,11 +23,21 @@ export class AuthController {
 
   @Post('login')
   @ApiOkResponse()
-  async login(@Body() payload: unknown) {
-    return sendEvent<{ code: number; msg: string; data: { token: string } }>(
-      this.authService,
-      AUTH_MSG_PATTERN.LOGIN,
-      payload,
-    );
+  @Public()
+  async login(
+    @Body() payload: unknown,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await sendEvent<{
+      code: number;
+      msg: string;
+      data: { token: string };
+    }>(this.authService, AUTH_MSG_PATTERN.LOGIN, payload);
+
+    res.cookie('token', result.data.token, { sameSite: true, httpOnly: true });
+    return {
+      code: result.code,
+      message: result.msg,
+    };
   }
 }
