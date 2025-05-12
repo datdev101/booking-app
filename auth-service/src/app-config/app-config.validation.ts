@@ -11,6 +11,9 @@ export class EnvironmentVariables {
 
   @IsString()
   RABBIT_MQ_AUTH_QUEUE: string;
+
+  @IsString()
+  MONGODB_URI: string;
 }
 
 export function validate(config: Record<string, unknown>) {

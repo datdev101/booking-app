@@ -1,13 +1,14 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern } from '@nestjs/microservices';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AUTH_MSG_PATTERN } from './auth.constant';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
-  @MessagePattern(AUTH_MSG_PATTERN.AUTH)
-  test() {
-    return {
-      msg: 'This is auth service',
-    };
+  constructor(private readonly authService: AuthService) {}
+
+  @MessagePattern(AUTH_MSG_PATTERN.REGISTER)
+  register(@Payload() payload: { email: string; password: string }) {
+    return this.authService.register(payload);
   }
 }

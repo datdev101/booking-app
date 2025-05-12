@@ -26,4 +26,12 @@ export class AppConfigService {
       },
     };
   }
+
+  get db() {
+    return {
+      mongo: {
+        uri: this.getKey('MONGODB_URI'),
+      },
+    };
+  }
 }

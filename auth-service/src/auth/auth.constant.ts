@@ -1,7 +1,10 @@
-import { IPattern } from 'src/common/interface';
+import { IPattern } from 'src/common/interfaces/message-pattern.interface';
 
 export const AUTH_MSG_PATTERN = {
-  AUTH: {
-    cmd: 'auth',
+  REGISTER: {
+    cmd: 'register',
+  },
+  LOGIN: {
+    cmd: 'login',
   },
 } satisfies Record<string, IPattern>;

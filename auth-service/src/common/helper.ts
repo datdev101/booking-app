@@ -1,6 +1,6 @@
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import { IPattern } from './interface';
+import { IPattern } from './interfaces/message-pattern.interface';
 
 export async function sendEvent<Response>(
   client: ClientProxy,
