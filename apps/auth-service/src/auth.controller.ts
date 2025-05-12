@@ -1,4 +1,4 @@
-import { IRegisterReq } from '@app/common';
+import { ILoginReq, IRegisterReq, IVerifyTokenReq } from '@app/common';
 import { RabbitmqService } from '@app/rabbitmq';
 import { Controller } from '@nestjs/common';
 import {
@@ -20,7 +20,18 @@ export class AuthController {
   @MessagePattern(AUTH_MSG_PATTERN.REGISTER)
   register(@Payload() payload: IRegisterReq, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
-
     return this.authService.register(payload);
+  }
+
+  @MessagePattern(AUTH_MSG_PATTERN.LOGIN)
+  async login(@Payload() payload: ILoginReq, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.authService.login(payload);
+  }
+
+  @MessagePattern(AUTH_MSG_PATTERN.VERIFY_TOKEN)
+  verifyToken(@Payload() payload: IVerifyTokenReq, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.authService.verifyToken(payload);
   }
 }
