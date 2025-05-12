@@ -1,0 +1,23 @@
+services:
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - 5672:5672
+    networks:
+      - api-gateway
+
+  mongo-db:
+    image: mongo:7
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - mongo-db
+    ports:
+      - 27017:27017
+
+networks:
+  api-gateway:
+  mongo-db:
+
+volumes:
+  mongo-data:

@@ -1,10 +1,15 @@
+import { AppConfigModule } from '@app/app-config';
 import { Module } from '@nestjs/common';
-import { ApiGatewayController } from './api-gateway.controller';
-import { ApiGatewayService } from './api-gateway.service';
+import { join } from 'path';
+
+import { EnvVar } from './config/env';
 
 @Module({
-  imports: [],
-  controllers: [ApiGatewayController],
-  providers: [ApiGatewayService],
+  imports: [
+    AppConfigModule.register({
+      path: join(process.cwd(), 'apps/api-gateway/.env'),
+      cls: EnvVar,
+    }),
+  ],
 })
 export class ApiGatewayModule {}
