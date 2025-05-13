@@ -9,7 +9,7 @@ import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { CONCERT_MSG_PATTERN, ConcertService } from './concert.constant';
 
-@Controller('concert')
+@Controller('concerts')
 export class ConcertController {
   constructor(
     @Inject(ConcertService) private readonly concertService: ClientProxy,

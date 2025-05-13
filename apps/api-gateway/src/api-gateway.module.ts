@@ -2,9 +2,10 @@ import { AppConfigModule } from '@app/app-config';
 import { Module } from '@nestjs/common';
 import { join } from 'path';
 
-import { EnvVar } from './config/env';
 import { AuthModule } from './auth/auth.module';
+import { BookingModule } from './booking/booking.module';
 import { ConcertModule } from './concert/concert.module';
+import { EnvVar } from './config/env';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ConcertModule } from './concert/concert.module';
     }),
     AuthModule,
     ConcertModule,
+    BookingModule,
   ],
 })
 export class ApiGatewayModule {}
