@@ -8,7 +8,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ClientProxy } from '@nestjs/microservices';
 
-import { IVerifyTokenRes } from '@app/common';
+import { IVerifyTokenReq, IVerifyTokenRes } from '@app/common';
 import { RabbitmqService } from '@app/rabbitmq';
 import { AUTH_MSG_PATTERN, AuthService, IS_PUBLIC_KEY } from './auth.constant';
 import { AuthRequest } from './auth.interface';
@@ -35,11 +35,10 @@ export class AuthGuard implements CanActivate {
     const token = request.cookies?.token as string | undefined;
     if (!token) throw new UnauthorizedException('Missing token');
 
-    const { user: authUser } = await this.rmqService.sendEvent<IVerifyTokenRes>(
-      this.authService,
-      AUTH_MSG_PATTERN.VERIFY_TOKEN,
-      { token },
-    );
+    const { user: authUser } = await this.rmqService.sendEvent<
+      IVerifyTokenReq,
+      IVerifyTokenRes
+    >(this.authService, AUTH_MSG_PATTERN.VERIFY_TOKEN, { token });
     // const isInBlackList = !!(await this.cacheService.cache.get(
     //   getAuthCacheKey(token),
     // ));

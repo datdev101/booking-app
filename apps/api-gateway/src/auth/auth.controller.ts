@@ -15,7 +15,7 @@ export class AuthController {
   @Public()
   @Post('register')
   async register(@Body() payload: IRegisterReq) {
-    const result = await this.rmqService.sendEvent<IRegisterRes>(
+    const result = await this.rmqService.sendEvent<IRegisterReq, IRegisterRes>(
       this.authService,
       AUTH_MSG_PATTERN.REGISTER,
       payload,
@@ -29,7 +29,7 @@ export class AuthController {
     @Body() payload: ILoginReq,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const result = await this.rmqService.sendEvent<ILoginRes>(
+    const result = await this.rmqService.sendEvent<ILoginReq, ILoginRes>(
       this.authService,
       AUTH_MSG_PATTERN.LOGIN,
       payload,

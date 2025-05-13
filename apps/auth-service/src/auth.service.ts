@@ -7,11 +7,7 @@ import {
   IVerifyTokenRes,
 } from '@app/common';
 import { throwRpcError } from '@app/common/helper';
-import {
-  BadRequestException,
-  Injectable,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserService } from './user/user.service';
@@ -24,16 +20,7 @@ export class AuthService {
   ) {}
 
   async register(dto: IRegisterReq): Promise<IRegisterRes> {
-    const existedUser = await this.userService.findOne({ email: dto.email });
-    if (existedUser) {
-      throwRpcError(new UnprocessableEntityException('Email already exist'));
-    }
-
-    const user = await this.userService.create({
-      email: dto.email,
-      password: await bcrypt.hash(dto.password, 10),
-    });
-
+    const user = await this.userService.create(dto);
     return {
       id: user._id.toString(),
       email: user.email,

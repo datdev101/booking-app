@@ -10,7 +10,7 @@ services:
     image: mongo:7
     volumes:
       - mongo-data:/data/db
-      - ./seed.js:/docker-entrypoint-initdb.d/seed.js
+      # - ./seed.js:/docker-entrypoint-initdb.d/seed.js
     networks:
       - mongo-db
     ports:

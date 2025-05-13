@@ -40,10 +40,10 @@ export class RabbitmqService {
     channel.ack(message);
   }
 
-  sendEvent<Response>(
+  sendEvent<Request, Response>(
     client: ClientProxy,
     pattern: IPattern,
-    data: unknown,
+    data: Request,
   ): Promise<Response> {
     const observableRes = client.send<Response>(pattern, data).pipe(
       catchError((error) =>

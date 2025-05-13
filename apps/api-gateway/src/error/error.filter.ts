@@ -26,7 +26,7 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
 
     const resException = new InternalServerErrorException();
 
-    super.catch(resException, host);
     console.error(resException);
+    super.catch(resException, host);
   }
 }
