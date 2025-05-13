@@ -6,6 +6,7 @@ import { RabbitmqService } from '@app/rabbitmq';
 import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { BOOKING_MSG_PATTERN, BookingService } from './booking.constant';
+import { CreateBookingReq } from './dto/req.dto';
 
 @Controller('booking')
 export class BookingController {
@@ -15,7 +16,7 @@ export class BookingController {
   ) {}
 
   @Post()
-  async createBooking(@Body() payload: ICreateBookingReq) {
+  async createBooking(@Body() payload: CreateBookingReq) {
     console.log(payload);
     const result = await this.rmqService.sendEvent<
       ICreateBookingReq,

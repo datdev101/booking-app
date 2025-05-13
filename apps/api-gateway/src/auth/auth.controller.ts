@@ -2,6 +2,10 @@ import { ILoginReq, ILoginRes, IRegisterReq, IRegisterRes } from '@app/common';
 import { RabbitmqService } from '@app/rabbitmq';
 import { Body, Controller, Inject, Post, Res } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import {
+  LoginReqDto,
+  RegisterReqDto,
+} from 'apps/api-gateway/src/auth/dto/req.dto';
 import { Response } from 'express';
 import { AUTH_MSG_PATTERN, AuthService, Public } from './auth.constant';
 
@@ -14,7 +18,7 @@ export class AuthController {
 
   @Public()
   @Post('register')
-  async register(@Body() payload: IRegisterReq) {
+  async register(@Body() payload: RegisterReqDto) {
     const result = await this.rmqService.sendEvent<IRegisterReq, IRegisterRes>(
       this.authService,
       AUTH_MSG_PATTERN.REGISTER,
@@ -26,7 +30,7 @@ export class AuthController {
   @Public()
   @Post('login')
   async login(
-    @Body() payload: ILoginReq,
+    @Body() payload: LoginReqDto,
     @Res({ passthrough: true }) res: Response,
   ) {
     const result = await this.rmqService.sendEvent<ILoginReq, ILoginRes>(

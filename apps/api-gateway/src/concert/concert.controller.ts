@@ -8,6 +8,7 @@ import { RabbitmqService } from '@app/rabbitmq';
 import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { CONCERT_MSG_PATTERN, ConcertService } from './concert.constant';
+import { GetAllConcertReq, GetByIdConcertReq } from './dto/req.dto';
 
 @Controller('concerts')
 export class ConcertController {
@@ -17,7 +18,7 @@ export class ConcertController {
   ) {}
 
   @Get()
-  async getAll(@Query() query: IGetAllConcertReq) {
+  async getAll(@Query() query: GetAllConcertReq) {
     const result = await this.rmqService.sendEvent<
       IGetAllConcertReq,
       IGetAllConcertRes
@@ -26,7 +27,7 @@ export class ConcertController {
   }
 
   @Get(':id')
-  async getById(@Param('id') id: string) {
+  async getById(@Param() { id }: GetByIdConcertReq) {
     const result = await this.rmqService.sendEvent<
       IGetByIdConcertReq,
       IGetByIdConcertRes

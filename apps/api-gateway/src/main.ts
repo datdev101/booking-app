@@ -1,4 +1,5 @@
 import { AppConfigService } from '@app/app-config';
+import { ValidationPipe } from '@nestjs/common';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
 import { ApiGatewayModule } from './api-gateway.module';
@@ -15,6 +16,15 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
   app.useGlobalGuards(app.get(AuthGuard));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
+      stopAtFirstError: true,
+      whitelist: true,
+    }),
+  );
 
   await app.listen(appConfig.get('APP_PORT'));
 }
