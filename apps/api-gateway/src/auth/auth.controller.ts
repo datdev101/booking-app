@@ -1,5 +1,5 @@
 import { ILoginReq, ILoginRes, IRegisterReq, IRegisterRes } from '@app/common';
-import { RabbitmqService } from '@app/rabbitmq';
+import { sendEventRmq } from '@app/common/helper';
 import { Body, Controller, Inject, Post, Res } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
@@ -11,15 +11,12 @@ import { AUTH_MSG_PATTERN, AuthService, Public } from './auth.constant';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    @Inject(AuthService) private readonly authService: ClientProxy,
-    private readonly rmqService: RabbitmqService,
-  ) {}
+  constructor(@Inject(AuthService) private readonly authService: ClientProxy) {}
 
   @Public()
   @Post('register')
   async register(@Body() payload: RegisterReqDto) {
-    const result = await this.rmqService.sendEvent<IRegisterReq, IRegisterRes>(
+    const result = await sendEventRmq<IRegisterReq, IRegisterRes>(
       this.authService,
       AUTH_MSG_PATTERN.REGISTER,
       payload,
@@ -33,7 +30,7 @@ export class AuthController {
     @Body() payload: LoginReqDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const result = await this.rmqService.sendEvent<ILoginReq, ILoginRes>(
+    const result = await sendEventRmq<ILoginReq, ILoginRes>(
       this.authService,
       AUTH_MSG_PATTERN.LOGIN,
       payload,

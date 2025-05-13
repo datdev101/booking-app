@@ -1,5 +1,4 @@
 import { AppConfigModule, AppConfigService } from '@app/app-config';
-import { RabbitmqModule } from '@app/rabbitmq';
 import { RedisModule } from '@app/redis';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -15,7 +14,6 @@ import { Concert, ConcertSchema } from './schemas/concert.schema';
       path: join(process.cwd(), 'apps/concert-service/.env'),
       cls: EnvVar,
     }),
-    RabbitmqModule,
     MongooseModule.forRootAsync({
       imports: [AppConfigModule],
       inject: [AppConfigService],

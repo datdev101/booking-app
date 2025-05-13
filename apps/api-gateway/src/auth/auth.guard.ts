@@ -9,7 +9,7 @@ import { Reflector } from '@nestjs/core';
 import { ClientProxy } from '@nestjs/microservices';
 
 import { IVerifyTokenReq, IVerifyTokenRes } from '@app/common';
-import { RabbitmqService } from '@app/rabbitmq';
+import { sendEventRmq } from '@app/common/helper';
 import { AUTH_MSG_PATTERN, AuthService, IS_PUBLIC_KEY } from './auth.constant';
 import { AuthRequest } from './auth.interface';
 
@@ -18,7 +18,6 @@ export class AuthGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
     @Inject(AuthService) private readonly authService: ClientProxy,
-    private readonly rmqService: RabbitmqService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -35,7 +34,7 @@ export class AuthGuard implements CanActivate {
     const token = request.cookies?.token as string | undefined;
     if (!token) throw new UnauthorizedException('Missing token');
 
-    const { user: authUser } = await this.rmqService.sendEvent<
+    const { user: authUser } = await sendEventRmq<
       IVerifyTokenReq,
       IVerifyTokenRes
     >(this.authService, AUTH_MSG_PATTERN.VERIFY_TOKEN, { token });

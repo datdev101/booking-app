@@ -28,4 +28,8 @@ export class EnvVar {
   @IsString()
   @IsNotEmpty()
   RABBIT_MQ_CONCERT_QUEUE: string;
+
+  @IsString()
+  @IsNotEmpty()
+  RABBIT_MQ_BOOKING_QUEUE: string;
 }

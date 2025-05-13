@@ -1,4 +1,91 @@
 services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - SERVICE_NAME=api-gateway
+    environment:
+      - APP_ENV=$APP_ENV
+      - APP_PORT=$APP_PORT
+      - RABBIT_MQ_URI=$RABBIT_MQ_URI
+      - RABBIT_MQ_AUTH_QUEUE=$RABBIT_MQ_AUTH_QUEUE
+      - RABBIT_MQ_CONCERT_QUEUE=$RABBIT_MQ_CONCERT_QUEUE
+      - RABBIT_MQ_BOOKING_QUEUE=$RABBIT_MQ_BOOKING_QUEUE
+    ports:
+      - $APP_PORT:$APP_PORT
+    networks:
+      - api-gateway
+      - mongodb
+    depends_on:
+      - rabbitmq
+      - mongodb
+      - redis
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - SERVICE_NAME=auth-service
+    environment:
+      - APP_ENV=$APP_ENV
+      - RABBIT_MQ_URI=$RABBIT_MQ_URI
+      - RABBIT_MQ_AUTH_QUEUE=$RABBIT_MQ_AUTH_QUEUE
+      - MONGODB_URI=$MONGODB_URI
+      - JWT_EXPIRE=$JWT_EXPIRE
+      - JWT_SECRET=$JWT_SECRET
+    networks:
+      - api-gateway
+      - mongodb
+    depends_on:
+      - rabbitmq
+      - mongodb
+      - redis
+
+  concert-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - SERVICE_NAME=concert-service
+    environment:
+      - APP_ENV=$APP_ENV
+      - RABBIT_MQ_URI=$RABBIT_MQ_URI
+      - RABBIT_MQ_CONCERT_QUEUE=$RABBIT_MQ_CONCERT_QUEUE
+      - MONGODB_URI=$MONGODB_URI
+      - REDIS_HOST=$REDIS_HOST
+      - REDIS_PORT=$REDIS_PORT
+    networks:
+      - api-gateway
+      - mongodb
+    depends_on:
+      - rabbitmq
+      - mongodb
+      - redis
+
+  booking-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - SERVICE_NAME=booking-service
+    environment:
+      - APP_ENV=ldev
+      - RABBIT_MQ_URI=$RABBIT_MQ_URI
+      - MONGODB_URI=$MONGODB_URI
+      - RABBIT_MQ_BOOKING_QUEUE=$RABBIT_MQ_BOOKING_QUEUE
+      - RABBIT_MQ_CONCERT_QUEUE=$RABBIT_MQ_CONCERT_QUEUE
+      - REDIS_HOST=$REDIS_HOST
+      - REDIS_PORT=$REDIS_PORT
+    networks:
+      - api-gateway
+      - mongodb
+    depends_on:
+      - rabbitmq
+      - mongodb
+      - redis
+
   rabbitmq:
     image: rabbitmq
     ports:
@@ -6,13 +93,12 @@ services:
     networks:
       - api-gateway
 
-  mongo-db:
+  mongodb:
     image: mongo:7
     volumes:
       - mongo-data:/data/db
-      # - ./seed.js:/docker-entrypoint-initdb.d/seed.js
     networks:
-      - mongo-db
+      - mongodb
     ports:
       - 27017:27017
 
@@ -25,7 +111,7 @@ services:
 
 networks:
   api-gateway:
-  mongo-db:
+  mongodb:
 
 volumes:
   mongo-data:

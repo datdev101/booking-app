@@ -1,5 +1,4 @@
 import { AppConfigModule, AppConfigService } from '@app/app-config';
-import { RabbitmqModule } from '@app/rabbitmq';
 import { Module } from '@nestjs/common';
 import { join } from 'path';
 
@@ -16,7 +15,6 @@ import { UserModule } from './user/user.module';
       path: join(process.cwd(), 'apps/auth-service/.env'),
       cls: EnvVar,
     }),
-    RabbitmqModule,
     UserModule,
     MongooseModule.forRootAsync({
       imports: [AppConfigModule],

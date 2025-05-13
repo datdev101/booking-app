@@ -1,9 +1,9 @@
+import { ackRmq } from '@app/common/helper';
 import {
   IGetAllConcertReq,
   IGetAvailableSeatsReq,
   IGetByIdConcertReq,
 } from '@app/common/interfaces/concert.interface';
-import { RabbitmqService } from '@app/rabbitmq';
 import { Controller } from '@nestjs/common';
 import {
   Ctx,
@@ -16,20 +16,17 @@ import { ConcertService } from './concert.service';
 
 @Controller()
 export class ConcertController {
-  constructor(
-    private readonly concertService: ConcertService,
-    private readonly rmqService: RabbitmqService,
-  ) {}
+  constructor(private readonly concertService: ConcertService) {}
 
   @MessagePattern(CONCERT_MSG_PATTERN.GET_ALL)
   getAll(@Payload() payload: IGetAllConcertReq, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
+    ackRmq(context);
     return this.concertService.getAll(payload);
   }
 
   @MessagePattern(CONCERT_MSG_PATTERN.GET_BY_ID)
   getById(@Payload() payload: IGetByIdConcertReq, @Ctx() context: RmqContext) {
-    this.rmqService.ack(context);
+    ackRmq(context);
     return this.concertService.getById(payload);
   }
 
@@ -38,7 +35,7 @@ export class ConcertController {
     @Payload() payload: IGetAvailableSeatsReq,
     @Ctx() context: RmqContext,
   ) {
-    this.rmqService.ack(context);
+    ackRmq(context);
     return this.concertService.getAvailableSeats(payload);
   }
 }

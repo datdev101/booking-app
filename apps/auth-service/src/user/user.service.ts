@@ -47,7 +47,8 @@ export class UserService implements OnModuleInit {
     const concertsData = Array.from({ length: 1000 }).map((_, i) => {
       return {
         email: `user${i}@email.com`,
-        password: '123456',
+        password:
+          '$2b$10$i0.dP.IXej0wjFktwPYcqOAtNxFBkmWFYdyaTYO5aP2dOdibPJc.G', // 123456
       };
     });
 
