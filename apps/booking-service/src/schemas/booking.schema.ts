@@ -12,14 +12,8 @@ export class Booking extends Document {
   @Prop({ type: SchemaTypes.ObjectId })
   seatTypeId: Types.ObjectId;
 
-  @Prop()
-  seatType: 'vip' | 'regular' | 'standing';
-
-  @Prop({ type: Number })
-  price: number;
-
-  @Prop()
-  status: 'confirmed' | 'cancel';
+  @Prop({ enum: ['confirmed', 'canceled'] })
+  status: 'confirmed' | 'canceled';
 
   @Prop({ type: Date, default: null })
   cancelAt: Date | null;

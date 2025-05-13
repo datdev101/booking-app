@@ -1,5 +1,6 @@
 import { AppConfigModule, AppConfigService } from '@app/app-config';
 import { RabbitmqModule } from '@app/rabbitmq';
+import { RedisModule } from '@app/redis';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { join } from 'path';
@@ -23,6 +24,7 @@ import { Concert, ConcertSchema } from './schemas/concert.schema';
       }),
     }),
     MongooseModule.forFeature([{ name: Concert.name, schema: ConcertSchema }]),
+    RedisModule.register(),
   ],
   controllers: [ConcertController],
   providers: [ConcertService],

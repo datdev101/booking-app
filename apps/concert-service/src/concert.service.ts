@@ -1,102 +1,32 @@
+import { throwRpcError } from '@app/common/helper';
 import {
   IGetAllConcertReq,
   IGetByIdConcertReq,
 } from '@app/common/interfaces/concert.interface';
-import { Injectable } from '@nestjs/common';
+import { RedisService } from '@app/redis';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  OnModuleInit,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Redis } from 'ioredis';
 import { Model } from 'mongoose';
 import { Concert } from './schemas/concert.schema';
 
 @Injectable()
-export class ConcertService {
+export class ConcertService implements OnModuleInit {
   constructor(
     @InjectModel(Concert.name) private readonly concertModel: Model<Concert>,
+    @Inject(RedisService) private readonly redisService: Redis,
   ) {}
 
-  async test() {
-    const concerts = [
-      {
-        name: 'Rock Fest 2025',
-        date: '2025-08-15T19:00:00.000Z',
-        isActivated: true,
-        seatTypes: [
-          { type: 'vip', price: 150, totalTickets: 50 },
-          { type: 'regular', price: 80, totalTickets: 200 },
-        ],
-      },
-      {
-        name: 'Jazz Night',
-        date: '2025-06-20T20:30:00.000Z',
-        isActivated: false,
-        seatTypes: [
-          { type: 'vip', price: 120, totalTickets: 40 },
-          { type: 'standing', price: 60, totalTickets: 150 },
-        ],
-      },
-      {
-        name: 'EDM Summer Bash',
-        date: '2025-07-04T22:00:00.000Z',
-        isActivated: true,
-        seatTypes: [{ type: 'standing', price: 90, totalTickets: 500 }],
-      },
-      {
-        name: 'Symphony in the Park',
-        date: '2025-09-10T18:00:00.000Z',
-        isActivated: true,
-        seatTypes: [{ type: 'regular', price: 50, totalTickets: 300 }],
-      },
-      {
-        name: 'Hip Hop Takeover',
-        date: '2025-10-01T21:00:00.000Z',
-        isActivated: false,
-        seatTypes: [
-          { type: 'vip', price: 200, totalTickets: 100 },
-          { type: 'regular', price: 100, totalTickets: 250 },
-          { type: 'standing', price: 70, totalTickets: 400 },
-        ],
-      },
-      {
-        name: 'Acoustic Evenings',
-        date: '2025-05-25T19:00:00.000Z',
-        isActivated: true,
-        seatTypes: [{ type: 'regular', price: 60, totalTickets: 150 }],
-      },
-      {
-        name: 'Pop Stars Live',
-        date: '2025-11-12T20:00:00.000Z',
-        isActivated: false,
-        seatTypes: [
-          { type: 'vip', price: 180, totalTickets: 80 },
-          { type: 'standing', price: 90, totalTickets: 350 },
-        ],
-      },
-      {
-        name: 'Country Music Gala',
-        date: '2025-08-01T17:30:00.000Z',
-        isActivated: true,
-        seatTypes: [
-          { type: 'regular', price: 70, totalTickets: 200 },
-          { type: 'vip', price: 130, totalTickets: 50 },
-        ],
-      },
-      {
-        name: 'Metal Mayhem',
-        date: '2025-12-05T21:30:00.000Z',
-        isActivated: false,
-        seatTypes: [{ type: 'standing', price: 100, totalTickets: 300 }],
-      },
-      {
-        name: 'Latin Fiesta',
-        date: '2025-07-16T20:00:00.000Z',
-        isActivated: true,
-        seatTypes: [
-          { type: 'vip', price: 140, totalTickets: 60 },
-          { type: 'regular', price: 90, totalTickets: 250 },
-        ],
-      },
-    ];
+  async onModuleInit() {
+    // seed sample concerts if data not exist
+    await this.seedData();
 
-    return await this.concertModel.create(concerts);
+    // load availableSeats to redis
   }
 
   getAll(dto: IGetAllConcertReq) {
@@ -111,5 +41,64 @@ export class ConcertService {
       .findById(dto.id)
       .select('_id name date isActivated seatTypes')
       .exec();
+  }
+
+  async getAvailableSeats(dto: { concertId: string; seatTypeId: string }) {
+    const key = `concert:${dto.concertId}:seatType:${dto.seatTypeId}`;
+    const availableSeats = await this.redisService.get(key);
+
+    if (availableSeats !== null) return availableSeats;
+
+    const result = await this.concertModel
+      .findOne({
+        _id: dto.concertId,
+        'seatTypes._id': dto.seatTypeId,
+      })
+      .select('seatTypes.$')
+      .exec();
+
+    if (result == null || result.seatTypes.length == 0) {
+      throwRpcError(new BadRequestException('Invalid id'));
+    }
+
+    const seats = result.seatTypes[0].availableSeats;
+    await this.redisService.set(key, seats);
+
+    return seats;
+  }
+
+  private async seedData() {
+    const existResult = await this.concertModel.findOne();
+    if (existResult) return [];
+
+    const concertsData = Array.from({ length: 10 }).map((_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() + i * 5); // spread out concerts
+
+      return {
+        name: `Concert ${i + 1}`,
+        date,
+        isActivated: i % 2 === 0, // alternate activation
+        seatTypes: [
+          {
+            type: 'vip',
+            totalSeats: 50,
+            availableSeats: 50,
+          },
+          {
+            type: 'regular',
+            totalSeats: 200,
+            availableSeats: 200,
+          },
+          {
+            type: 'standing',
+            totalSeats: 100,
+            availableSeats: 100,
+          },
+        ],
+      };
+    });
+
+    return await this.concertModel.insertMany(concertsData);
   }
 }

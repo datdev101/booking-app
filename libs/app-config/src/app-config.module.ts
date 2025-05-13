@@ -15,8 +15,6 @@ export class AppConfigModule {
   }): DynamicModule {
     return {
       module: AppConfigModule,
-      providers: [AppConfigService],
-      exports: [AppConfigService],
       imports: [
         ConfigModule.forRoot({
           envFilePath: option.path,

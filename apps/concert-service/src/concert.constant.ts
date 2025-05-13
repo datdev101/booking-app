@@ -7,4 +7,7 @@ export const CONCERT_MSG_PATTERN = {
   GET_BY_ID: {
     cmd: 'get-by-id',
   },
+  GET_AVAILABLE_SEATS: {
+    cmd: 'get-available-seats',
+  },
 } satisfies Record<string, IPattern>;

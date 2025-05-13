@@ -1,5 +1,4 @@
 import { ICreateBookingReq } from '@app/common/interfaces/booking.interface';
-import { RabbitmqService } from '@app/rabbitmq';
 import { Controller } from '@nestjs/common';
 import {
   Ctx,
@@ -12,15 +11,15 @@ import { BookingService } from './booking.service';
 
 @Controller()
 export class BookingController {
-  constructor(
-    private readonly bookingService: BookingService,
-    private readonly rmqService: RabbitmqService,
-  ) {}
+  constructor(private readonly bookingService: BookingService) {}
 
   @MessagePattern(BOOKING_MSG_PATTERN.CREATE_BOOKING)
   getAll(@Payload() payload: ICreateBookingReq, @Ctx() context: RmqContext) {
-    console.log(payload);
-    this.rmqService.ack(context);
-    return { msg: 'Hello' };
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const channel = context.getChannelRef();
+    const message = context.getMessage();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    channel.ack(message);
+    return this.bookingService.createBooking(payload);
   }
 }

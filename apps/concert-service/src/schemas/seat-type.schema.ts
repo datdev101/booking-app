@@ -1,15 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-@Schema({ timestamps: true })
+@Schema()
 export class SeatType {
   @Prop({ required: true, enum: ['vip', 'regular', 'standing'] })
   type: 'vip' | 'regular' | 'standing';
 
   @Prop({ required: true })
-  price: number;
+  totalSeats: number;
 
   @Prop({ required: true })
-  totalTickets: number;
+  availableSeats: number;
 }
 
 export const SeatTypeSchema = SchemaFactory.createForClass(SeatType);

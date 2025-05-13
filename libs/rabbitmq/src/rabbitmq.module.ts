@@ -12,7 +12,9 @@ export class RabbitmqModule {
   static register(dto: { queue: string; service: string }): DynamicModule {
     return {
       module: RabbitmqModule,
+      exports: [ClientsModule],
       imports: [
+        AppConfigModule,
         ClientsModule.registerAsync([
           {
             name: dto.service,
@@ -35,7 +37,6 @@ export class RabbitmqModule {
           },
         ]),
       ],
-      exports: [ClientsModule],
     };
   }
 }

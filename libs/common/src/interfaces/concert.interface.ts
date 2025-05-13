@@ -23,9 +23,13 @@ export interface IGetByIdConcertRes {
   seatTypes: [
     {
       type: string;
-      price: number;
       totalTickets: number;
       remainingTickets: number;
     },
   ];
+}
+
+export interface IGetAvailableSeatsReq {
+  concertId: string;
+  seatTypeId: string;
 }

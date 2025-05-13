@@ -1,6 +1,7 @@
 import { AppConfigModule, AppConfigService } from '@app/app-config';
-import { RabbitmqModule } from '@app/rabbitmq';
+import { RedisModule } from '@app/redis';
 import { Module } from '@nestjs/common';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
 import { join } from 'path';
 import { BookingController } from './booking.controller';
@@ -14,7 +15,6 @@ import { Booking, BookingSchema } from './schemas/booking.schema';
       path: join(process.cwd(), 'apps/booking-service/.env'),
       cls: EnvVar,
     }),
-    RabbitmqModule,
     MongooseModule.forRootAsync({
       imports: [AppConfigModule],
       inject: [AppConfigService],
@@ -23,6 +23,24 @@ import { Booking, BookingSchema } from './schemas/booking.schema';
       }),
     }),
     MongooseModule.forFeature([{ name: Booking.name, schema: BookingSchema }]),
+    RedisModule.register(),
+    ClientsModule.registerAsync([
+      {
+        name: 'ConcertService',
+        imports: [AppConfigModule],
+        inject: [AppConfigService],
+        useFactory: (appConfig: AppConfigService<EnvVar>) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [appConfig.get<string>('RABBIT_MQ_URI')],
+            queue: appConfig.get('RABBIT_MQ_CONCERT_QUEUE'),
+            queueOptions: {
+              durable: true,
+            },
+          },
+        }),
+      },
+    ]),
   ],
   controllers: [BookingController],
   providers: [BookingService],

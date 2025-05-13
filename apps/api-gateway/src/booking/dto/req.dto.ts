@@ -3,11 +3,5 @@ import { PickType } from '@nestjs/swagger';
 import { BookingDto } from './base.dto';
 
 export class CreateBookingReq
-  extends PickType(BookingDto, [
-    'userId',
-    'concertId',
-    'seatType',
-    'seatTypeId',
-    'price',
-  ])
+  extends PickType(BookingDto, ['userId', 'concertId', 'seatTypeId'])
   implements ICreateBookingReq {}

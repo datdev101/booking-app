@@ -1,5 +1,6 @@
 import {
   IGetAllConcertReq,
+  IGetAvailableSeatsReq,
   IGetByIdConcertReq,
 } from '@app/common/interfaces/concert.interface';
 import { RabbitmqService } from '@app/rabbitmq';
@@ -30,5 +31,14 @@ export class ConcertController {
   getById(@Payload() payload: IGetByIdConcertReq, @Ctx() context: RmqContext) {
     this.rmqService.ack(context);
     return this.concertService.getById(payload);
+  }
+
+  @MessagePattern(CONCERT_MSG_PATTERN.GET_AVAILABLE_SEATS)
+  getAvailableSeats(
+    @Payload() payload: IGetAvailableSeatsReq,
+    @Ctx() context: RmqContext,
+  ) {
+    this.rmqService.ack(context);
+    return this.concertService.getAvailableSeats(payload);
   }
 }

@@ -17,7 +17,6 @@ export class BookingController {
 
   @Post()
   async createBooking(@Body() payload: CreateBookingReq) {
-    console.log(payload);
     const result = await this.rmqService.sendEvent<
       ICreateBookingReq,
       ICreateBookingRes

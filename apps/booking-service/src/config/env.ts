@@ -15,5 +15,9 @@ export class EnvVar {
 
   @IsString()
   @IsNotEmpty()
+  RABBIT_MQ_CONCERT_QUEUE: string;
+
+  @IsString()
+  @IsNotEmpty()
   MONGODB_URI: string;
 }

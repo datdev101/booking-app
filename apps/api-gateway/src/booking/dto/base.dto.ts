@@ -1,10 +1,4 @@
-import {
-  IsDate,
-  IsEnum,
-  IsMongoId,
-  IsNumber,
-  ValidateIf,
-} from 'class-validator';
+import { IsDate, IsEnum, IsMongoId, ValidateIf } from 'class-validator';
 
 enum SeatType {
   VIP = 'vip',
@@ -32,9 +26,6 @@ export class BookingDto {
 
   @IsEnum(SeatType)
   seatType: SeatType;
-
-  @IsNumber()
-  price: number;
 
   @IsEnum(Status)
   status: Status;
