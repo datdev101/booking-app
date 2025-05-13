@@ -1,6 +1,10 @@
 FROM node:20-slim AS base
-
 WORKDIR /app
+
+# Dev only
+FROM base AS dev
+COPY package.json yarn.lock ./
+RUN yarn
 
 ### BUILDER PRODUCTION ###
 FROM base AS builder-production
