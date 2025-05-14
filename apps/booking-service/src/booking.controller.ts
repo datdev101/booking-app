@@ -1,3 +1,4 @@
+import { ackRmq } from '@app/common/helper';
 import { ICreateBookingReq } from '@app/common/interfaces/booking.interface';
 import { Controller } from '@nestjs/common';
 import {
@@ -15,11 +16,7 @@ export class BookingController {
 
   @MessagePattern(BOOKING_MSG_PATTERN.CREATE_BOOKING)
   getAll(@Payload() payload: ICreateBookingReq, @Ctx() context: RmqContext) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const channel = context.getChannelRef();
-    const message = context.getMessage();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    channel.ack(message);
+    ackRmq(context);
     return this.bookingService.createBooking(payload);
   }
 }

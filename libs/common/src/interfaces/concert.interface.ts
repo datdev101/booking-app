@@ -33,3 +33,8 @@ export interface IGetAvailableSeatsReq {
   concertId: string;
   seatTypeId: string;
 }
+
+export interface IUpdateAvailableSeatsReq {
+  concertId: string;
+  seatTypeId: string;
+}

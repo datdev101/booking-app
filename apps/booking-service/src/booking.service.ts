@@ -1,5 +1,9 @@
-import { throwRpcError } from '@app/common/helper';
+import { sendEventRmq, throwRpcError } from '@app/common/helper';
 import { ICreateBookingReq } from '@app/common/interfaces/booking.interface';
+import {
+  IGetAvailableSeatsReq,
+  IUpdateAvailableSeatsReq,
+} from '@app/common/interfaces/concert.interface';
 import { RED_LOCK, RedisService } from '@app/redis';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
@@ -7,7 +11,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Redis } from 'ioredis';
 import { Model } from 'mongoose';
 import Redlock from 'redlock';
-import { lastValueFrom } from 'rxjs';
+import { CONCERT_MSG_PATTERN } from './booking.constant';
 import { Booking } from './schemas/booking.schema';
 
 @Injectable()
@@ -28,33 +32,43 @@ export class BookingService {
 
     try {
       // Check availability
-      const availableSeats = await lastValueFrom(
-        this.concertService.send<number>(
-          {
-            cmd: 'get-available-seats',
-          },
-          dto,
-        ),
+      const availableSeats = await sendEventRmq<IGetAvailableSeatsReq, number>(
+        this.concertService,
+        CONCERT_MSG_PATTERN.GET_AVAILABLE_SEATS,
+        dto,
       );
 
       if (!availableSeats) {
         throwRpcError(new BadRequestException('No available seats left'));
       }
 
-      // Create booking
-      const booking = await this.bookingModel.create({
-        userId,
-        concertId,
-        seatTypeId,
-        status: 'CONFIRMED',
-      });
+      // TODO: check user has booked before ?
 
+      // update available seats
       await this.redisService.set(
         `concert:${dto.concertId}:seatType:${dto.seatTypeId}`,
         availableSeats - 1,
       );
 
+      // Create booking
+      const booking = await this.bookingModel.create({
+        userId,
+        concertId,
+        seatTypeId,
+        status: 'confirmed',
+      });
+
+      // decrease seat
+      await sendEventRmq<IUpdateAvailableSeatsReq, unknown>(
+        this.concertService,
+        CONCERT_MSG_PATTERN.UPDATE_AVAILABLE_SEATS,
+        dto,
+      );
+
       return booking;
+    } catch (err) {
+      console.error(err);
+      // throw err;
     } finally {
       await lock.release();
     }

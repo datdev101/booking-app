@@ -3,6 +3,7 @@ import {
   IGetAllConcertReq,
   IGetAvailableSeatsReq,
   IGetByIdConcertReq,
+  IUpdateAvailableSeatsReq,
 } from '@app/common/interfaces/concert.interface';
 import { Controller } from '@nestjs/common';
 import {
@@ -37,5 +38,14 @@ export class ConcertController {
   ) {
     ackRmq(context);
     return this.concertService.getAvailableSeats(payload);
+  }
+
+  @MessagePattern(CONCERT_MSG_PATTERN.UPDATE_AVAILABLE_SEATS)
+  updateAvailableSeats(
+    @Payload() payload: IUpdateAvailableSeatsReq,
+    @Ctx() context: RmqContext,
+  ) {
+    ackRmq(context);
+    return this.concertService.updateAvailableSeats(payload);
   }
 }

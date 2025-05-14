@@ -25,8 +25,6 @@ export class ConcertService implements OnModuleInit {
   async onModuleInit() {
     // seed sample concerts if data not exist
     await this.seedData();
-
-    // load availableSeats to redis
   }
 
   getAll(dto: IGetAllConcertReq) {
@@ -36,7 +34,7 @@ export class ConcertService implements OnModuleInit {
       .exec();
   }
 
-  getById(dto: IGetByIdConcertReq) {
+  async getById(dto: IGetByIdConcertReq) {
     return this.concertModel
       .findById(dto.id)
       .select('_id name date isActivated seatTypes')
@@ -47,7 +45,7 @@ export class ConcertService implements OnModuleInit {
     const key = `concert:${dto.concertId}:seatType:${dto.seatTypeId}`;
     const availableSeats = await this.redisService.get(key);
 
-    if (availableSeats !== null) return availableSeats;
+    if (availableSeats !== null) return Number(availableSeats);
 
     const result = await this.concertModel
       .findOne({
@@ -65,6 +63,18 @@ export class ConcertService implements OnModuleInit {
     await this.redisService.set(key, seats);
 
     return seats;
+  }
+
+  async updateAvailableSeats(dto: { concertId: string; seatTypeId: string }) {
+    return this.concertModel.findOneAndUpdate(
+      {
+        _id: dto.concertId,
+        'seatTypes._id': dto.seatTypeId,
+      },
+      {
+        $inc: { 'seatTypes.$.availableSeats': -1 },
+      },
+    );
   }
 
   private async seedData() {
