@@ -26,11 +26,13 @@ export class RedisModule {
         },
         {
           provide: RED_LOCK,
-          useFactory: (redisService: Redis) =>
-            new Redlock([redisService], {
+          inject: [RedisService],
+          useFactory: (redisService: Redis) => {
+            return new Redlock([redisService], {
               retryCount: 3,
               retryDelay: 200,
-            }),
+            });
+          },
         },
       ],
     };

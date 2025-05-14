@@ -10,4 +10,7 @@ export const CONCERT_MSG_PATTERN = {
   GET_AVAILABLE_SEATS: {
     cmd: 'get-available-seats',
   },
+  UPDATE_AVAILABLE_SEATS: {
+    cmd: 'update-available-seats',
+  },
 } satisfies Record<string, IPattern>;
