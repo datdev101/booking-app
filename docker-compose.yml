@@ -1,31 +1,110 @@
 services:
   api-gateway:
     build:
-      context: ./api-gateway
-    ports:
-      - 4200:4200
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - SERVICE_NAME=api-gateway
+      target: dev
+    command: yarn start:dev api-gateway
     environment:
-      - APP_ENV=dev
-      - APP_PORT=4200
-      - APP_PREFIX=api/v1
-      - RABBIT_MQ_URI=amqp://rabbitmq:5672
-      - RABBIT_MQ_AUTH_QUEUE=auth-queue
-    restart: on-failure
-    depends_on:
-      - auth-service
+      - APP_ENV=$APP_ENV
+      - APP_PORT=$APP_PORT
+      - RABBIT_MQ_URI=$RABBIT_MQ_URI
+      - RABBIT_MQ_AUTH_QUEUE=$RABBIT_MQ_AUTH_QUEUE
+      - RABBIT_MQ_CONCERT_QUEUE=$RABBIT_MQ_CONCERT_QUEUE
+      - RABBIT_MQ_BOOKING_QUEUE=$RABBIT_MQ_BOOKING_QUEUE
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - $APP_PORT:$APP_PORT
     networks:
       - api-gateway
+      - mongodb
+    depends_on:
+      - rabbitmq
+      - mongodb
+      - redis
 
   auth-service:
     build:
-      context: ./auth-service
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - SERVICE_NAME=auth-service
+      target: dev
+    command: yarn start:dev auth-service
     environment:
-      - APP_ENV=dev
-      - RABBIT_MQ_URI=amqp://rabbitmq:5672
-      - RABBIT_MQ_AUTH_QUEUE=auth-queue
-    restart: on-failure
+      - APP_ENV=$APP_ENV
+      - RABBIT_MQ_URI=$RABBIT_MQ_URI
+      - RABBIT_MQ_AUTH_QUEUE=$RABBIT_MQ_AUTH_QUEUE
+      - MONGODB_URI=$MONGODB_URI
+      - JWT_EXPIRE=$JWT_EXPIRE
+      - JWT_SECRET=$JWT_SECRET
+    volumes:
+      - .:/app
+      - /app/node_modules
     networks:
       - api-gateway
+      - mongodb
+    depends_on:
+      - rabbitmq
+      - mongodb
+      - redis
+
+  concert-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - SERVICE_NAME=concert-service
+      target: dev
+    command: yarn start:dev concert-service
+    environment:
+      - APP_ENV=$APP_ENV
+      - RABBIT_MQ_URI=$RABBIT_MQ_URI
+      - RABBIT_MQ_CONCERT_QUEUE=$RABBIT_MQ_CONCERT_QUEUE
+      - MONGODB_URI=$MONGODB_URI
+      - REDIS_HOST=$REDIS_HOST
+      - REDIS_PORT=$REDIS_PORT
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - api-gateway
+      - mongodb
+    depends_on:
+      - rabbitmq
+      - mongodb
+      - redis
+
+  booking-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - SERVICE_NAME=booking-service
+      target: dev
+    command: yarn start:dev booking-service
+    environment:
+      - APP_ENV=ldev
+      - RABBIT_MQ_URI=$RABBIT_MQ_URI
+      - MONGODB_URI=$MONGODB_URI
+      - RABBIT_MQ_BOOKING_QUEUE=$RABBIT_MQ_BOOKING_QUEUE
+      - RABBIT_MQ_CONCERT_QUEUE=$RABBIT_MQ_CONCERT_QUEUE
+      - REDIS_HOST=$REDIS_HOST
+      - REDIS_PORT=$REDIS_PORT
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - api-gateway
+      - mongodb
+    depends_on:
+      - rabbitmq
+      - mongodb
+      - redis
 
   rabbitmq:
     image: rabbitmq
@@ -34,18 +113,25 @@ services:
     networks:
       - api-gateway
 
-  mongo-db:
+  mongodb:
     image: mongo:7
     volumes:
       - mongo-data:/data/db
     networks:
-      - mongo-db
+      - mongodb
     ports:
       - 27017:27017
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
+    networks:
+      - api-gateway
+
 networks:
   api-gateway:
-  mongo-db:
+  mongodb:
 
 volumes:
   mongo-data:

@@ -1,0 +1,42 @@
+import { ILoginReq, ILoginRes, IRegisterReq, IRegisterRes } from '@app/common';
+import { sendEventRmq } from '@app/common/helper';
+import { Body, Controller, Inject, Post, Res } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import {
+  LoginReqDto,
+  RegisterReqDto,
+} from 'apps/api-gateway/src/auth/dto/req.dto';
+import { Response } from 'express';
+import { AUTH_MSG_PATTERN, AuthService, Public } from './auth.constant';
+
+@Controller('auth')
+export class AuthController {
+  constructor(@Inject(AuthService) private readonly authService: ClientProxy) {}
+
+  @Public()
+  @Post('register')
+  async register(@Body() payload: RegisterReqDto) {
+    const result = await sendEventRmq<IRegisterReq, IRegisterRes>(
+      this.authService,
+      AUTH_MSG_PATTERN.REGISTER,
+      payload,
+    );
+    return result;
+  }
+
+  @Public()
+  @Post('login')
+  async login(
+    @Body() payload: LoginReqDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await sendEventRmq<ILoginReq, ILoginRes>(
+      this.authService,
+      AUTH_MSG_PATTERN.LOGIN,
+      payload,
+    );
+
+    res.cookie('token', result.token, { sameSite: true, httpOnly: true });
+    return result;
+  }
+}
