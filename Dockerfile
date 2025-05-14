@@ -27,7 +27,7 @@ COPY . .
 RUN yarn build $SERVICE_NAME
 
 ### RUNNER ###
-FROM base
+FROM base AS production
 
 # Copy runtime dependencies
 COPY --from=builder-production /tmp/node_modules/ ./node_modules

@@ -4,28 +4,18 @@ import {
   IGetByIdConcertReq,
 } from '@app/common/interfaces/concert.interface';
 import { RedisService } from '@app/redis';
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  OnModuleInit,
-} from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Redis } from 'ioredis';
 import { Model } from 'mongoose';
 import { Concert } from './schemas/concert.schema';
 
 @Injectable()
-export class ConcertService implements OnModuleInit {
+export class ConcertService {
   constructor(
     @InjectModel(Concert.name) private readonly concertModel: Model<Concert>,
     @Inject(RedisService) private readonly redisService: Redis,
   ) {}
-
-  async onModuleInit() {
-    // seed sample concerts if data not exist
-    await this.seedData();
-  }
 
   getAll(dto: IGetAllConcertReq) {
     return this.concertModel
@@ -75,40 +65,5 @@ export class ConcertService implements OnModuleInit {
         $inc: { 'seatTypes.$.availableSeats': -1 },
       },
     );
-  }
-
-  private async seedData() {
-    const existResult = await this.concertModel.findOne();
-    if (existResult) return [];
-
-    const concertsData = Array.from({ length: 10 }).map((_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() + i * 5); // spread out concerts
-
-      return {
-        name: `Concert ${i + 1}`,
-        date,
-        isActivated: i % 2 === 0, // alternate activation
-        seatTypes: [
-          {
-            type: 'vip',
-            totalSeats: 50,
-            availableSeats: 50,
-          },
-          {
-            type: 'regular',
-            totalSeats: 200,
-            availableSeats: 200,
-          },
-          {
-            type: 'standing',
-            totalSeats: 100,
-            availableSeats: 100,
-          },
-        ],
-      };
-    });
-
-    return await this.concertModel.insertMany(concertsData);
   }
 }

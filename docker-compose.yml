@@ -5,8 +5,7 @@ services:
       dockerfile: Dockerfile
       args:
         - SERVICE_NAME=api-gateway
-      target: dev
-    command: yarn start:dev api-gateway
+      target: production
     environment:
       - APP_ENV=$APP_ENV
       - APP_PORT=$APP_PORT
@@ -14,11 +13,6 @@ services:
       - RABBIT_MQ_AUTH_QUEUE=$RABBIT_MQ_AUTH_QUEUE
       - RABBIT_MQ_CONCERT_QUEUE=$RABBIT_MQ_CONCERT_QUEUE
       - RABBIT_MQ_BOOKING_QUEUE=$RABBIT_MQ_BOOKING_QUEUE
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/dist
-    restart: unless-stopped
     ports:
       - $APP_PORT:$APP_PORT
     networks:
@@ -35,8 +29,7 @@ services:
       dockerfile: Dockerfile
       args:
         - SERVICE_NAME=auth-service
-      target: dev
-    command: yarn start:dev auth-service
+      target: production
     environment:
       - APP_ENV=$APP_ENV
       - RABBIT_MQ_URI=$RABBIT_MQ_URI
@@ -44,9 +37,6 @@ services:
       - MONGODB_URI=$MONGODB_URI
       - JWT_EXPIRE=$JWT_EXPIRE
       - JWT_SECRET=$JWT_SECRET
-    volumes:
-      - .:/app
-      - /app/node_modules
     networks:
       - api-gateway
       - mongodb
@@ -61,8 +51,7 @@ services:
       dockerfile: Dockerfile
       args:
         - SERVICE_NAME=concert-service
-      target: dev
-    command: yarn start:dev concert-service
+      target: production
     environment:
       - APP_ENV=$APP_ENV
       - RABBIT_MQ_URI=$RABBIT_MQ_URI
@@ -70,9 +59,6 @@ services:
       - MONGODB_URI=$MONGODB_URI
       - REDIS_HOST=$REDIS_HOST
       - REDIS_PORT=$REDIS_PORT
-    volumes:
-      - .:/app
-      - /app/node_modules
     networks:
       - api-gateway
       - mongodb
@@ -87,19 +73,15 @@ services:
       dockerfile: Dockerfile
       args:
         - SERVICE_NAME=booking-service
-      target: dev
-    command: yarn start:dev booking-service
+      target: production
     environment:
-      - APP_ENV=$APP_ENV
+      - APP_ENV=dev
       - RABBIT_MQ_URI=$RABBIT_MQ_URI
       - MONGODB_URI=$MONGODB_URI
       - RABBIT_MQ_BOOKING_QUEUE=$RABBIT_MQ_BOOKING_QUEUE
       - RABBIT_MQ_CONCERT_QUEUE=$RABBIT_MQ_CONCERT_QUEUE
       - REDIS_HOST=$REDIS_HOST
       - REDIS_PORT=$REDIS_PORT
-    volumes:
-      - .:/app
-      - /app/node_modules
     networks:
       - api-gateway
       - mongodb
@@ -119,6 +101,7 @@ services:
     image: mongo:7
     volumes:
       - mongo-data:/data/db
+      - ./seed:/docker-entrypoint-initdb.d
     networks:
       - mongodb
     ports:

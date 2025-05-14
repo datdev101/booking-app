@@ -3,7 +3,6 @@ import { throwRpcError } from '@app/common/helper';
 import {
   Injectable,
   InternalServerErrorException,
-  OnModuleInit,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,14 +11,10 @@ import { Model } from 'mongoose';
 import { User } from './schemas/user.schema';
 
 @Injectable()
-export class UserService implements OnModuleInit {
+export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
-
-  async onModuleInit() {
-    await this.seedData();
-  }
 
   async create(dto: ICreateUserReq) {
     try {
@@ -38,20 +33,5 @@ export class UserService implements OnModuleInit {
 
   findOne(dto: IFindOneUserReq) {
     return this.userModel.findOne(dto).exec();
-  }
-
-  private async seedData() {
-    const existResult = await this.userModel.findOne();
-    if (existResult) return [];
-
-    const concertsData = Array.from({ length: 1000 }).map((_, i) => {
-      return {
-        email: `user${i}@email.com`,
-        password:
-          '$2b$10$i0.dP.IXej0wjFktwPYcqOAtNxFBkmWFYdyaTYO5aP2dOdibPJc.G', // 123456
-      };
-    });
-
-    return await this.userModel.insertMany(concertsData);
   }
 }
