@@ -43,20 +43,40 @@ export class BookingService {
       }
 
       // TODO: check user has booked before ?
-
-      // update available seats
-      await this.redisService.set(
-        `concert:${dto.concertId}:seatType:${dto.seatTypeId}`,
-        availableSeats - 1,
-      );
-
-      // Create booking
-      const booking = await this.bookingModel.create({
+      // Check if user already has a confirmed booking for this concert
+      const existingBooking = await this.bookingModel.findOne({
         userId,
         concertId,
-        seatTypeId,
         status: 'confirmed',
       });
+
+      if (existingBooking) {
+        throwRpcError(new BadRequestException('User already booked'));
+      }
+
+      // Find any booking by this user for this concert (regardless of status)
+      // or create a new one if none exists
+      const booking = await this.bookingModel.findOneAndUpdate(
+        {
+          userId,
+          concertId,
+          status: 'confirmed',
+        },
+        {
+          $set: {
+            userId,
+            concertId,
+            seatTypeId,
+            status: 'confirmed',
+            updatedAt: new Date(),
+          },
+        },
+        {
+          new: true, // Return the updated document
+          upsert: true, // Create document if it doesn't exist
+          setDefaultsOnInsert: true, // Apply schema defaults if creating new doc
+        },
+      );
 
       // decrease seat
       await sendEventRmq<IUpdateAvailableSeatsReq, unknown>(
@@ -65,10 +85,16 @@ export class BookingService {
         dto,
       );
 
+      // update available seats
+      await this.redisService.set(
+        `concert:${dto.concertId}:seatType:${dto.seatTypeId}`,
+        availableSeats - 1,
+      );
+
       return booking;
     } catch (err) {
       console.error(err);
-      // throw err;
+      throw err;
     } finally {
       await lock.release();
     }
