@@ -1,7 +1,7 @@
 import { AppConfigModule, AppConfigService } from '@app/app-config';
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { EnvVar } from '../config/env';
+import { EnvVar } from '../../config/env';
 import { ConcertService } from './concert.constant';
 import { ConcertController } from './concert.controller';
 

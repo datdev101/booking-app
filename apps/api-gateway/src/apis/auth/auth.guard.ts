@@ -8,9 +8,9 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ClientProxy } from '@nestjs/microservices';
 
-import { IVerifyTokenReq, IVerifyTokenRes } from '@app/common';
+import { IVerifyTokenReq, IVerifyTokenRes, MESSAGE_PATTERN } from '@app/common';
 import { sendEventRmq } from '@app/common/helper';
-import { AUTH_MSG_PATTERN, AuthService, IS_PUBLIC_KEY } from './auth.constant';
+import { AuthService, IS_PUBLIC_KEY } from './auth.constant';
 import { AuthRequest } from './auth.interface';
 
 @Injectable()
@@ -37,7 +37,7 @@ export class AuthGuard implements CanActivate {
     const { user: authUser } = await sendEventRmq<
       IVerifyTokenReq,
       IVerifyTokenRes
-    >(this.authService, AUTH_MSG_PATTERN.VERIFY_TOKEN, { token });
+    >(this.authService, MESSAGE_PATTERN.AUTH.VERIFY_TOKEN, { token });
     // const isInBlackList = !!(await this.cacheService.cache.get(
     //   getAuthCacheKey(token),
     // ));

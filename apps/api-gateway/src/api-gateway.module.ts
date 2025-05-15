@@ -2,9 +2,9 @@ import { AppConfigModule } from '@app/app-config';
 import { Module } from '@nestjs/common';
 import { join } from 'path';
 
-import { AuthModule } from './auth/auth.module';
-import { BookingModule } from './booking/booking.module';
-import { ConcertModule } from './concert/concert.module';
+import { AuthModule } from './apis/auth/auth.module';
+import { BookingModule } from './apis/booking/booking.module';
+import { ConcertModule } from './apis/concert/concert.module';
 import { EnvVar } from './config/env';
 
 @Module({

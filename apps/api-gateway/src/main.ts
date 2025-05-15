@@ -1,11 +1,12 @@
 import { AppConfigService } from '@app/app-config';
 import { ValidationPipe } from '@nestjs/common';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { ApiGatewayModule } from './api-gateway.module';
-import { AuthGuard } from './auth/auth.guard';
+import { AuthGuard } from './apis/auth/auth.guard';
 import { EnvVar } from './config/env';
-import { AllExceptionsFilter } from './error/error.filter';
+import { AllExceptionsFilter } from './handler/error/error.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(ApiGatewayModule);
@@ -25,6 +26,10 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+
+  const swaggerConfig = new DocumentBuilder().build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, document);
 
   await app.listen(appConfig.get('APP_PORT'));
 }

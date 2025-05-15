@@ -1,39 +1,36 @@
 FROM node:20-slim AS base
 WORKDIR /app
 
-# Dev only
-FROM base AS dev
+###### LIB BUILDER ######
+FROM base AS lib-builder
 COPY package.json yarn.lock ./
-RUN yarn
-
-### BUILDER PRODUCTION ###
-FROM base AS builder-production
-
-# Install production dependencies
-COPY package.json yarn.lock ./
-
 RUN yarn install --prod --frozen-lockfile --ignore-scripts \
     && cp -RL node_modules/ /tmp/node_modules
+#########################
 
-### BUILDER APP ###
-FROM base AS builder
-ARG SERVICE_NAME
+###### SERVICE BUILDER ######
+FROM base AS service-builder
 WORKDIR /app
-
+ARG SERVICE_NAME
 COPY package.json yarn.lock ./
 RUN yarn --frozen-lockfile
-
 COPY . .
 RUN yarn build $SERVICE_NAME
+############################
 
-### RUNNER ###
+######## LOCAL DEV ########
+FROM lib-builder AS local
+WORKDIR /app
+ARG SERVICE_NAME
+ENV SERVICE_NAME=$SERVICE_NAME
+CMD yarn start:dev $SERVICE_NAME
+##########################
+
+### SERVICE RUNNER ###
 FROM base AS production
-
-# Copy runtime dependencies
-COPY --from=builder-production /tmp/node_modules/ ./node_modules
-# Copy runtime project
-COPY --from=builder /app/dist ./src
+COPY --from=lib-builder /tmp/node_modules/ ./node_modules
+COPY --from=service-builder /app/dist ./src
 ARG SERVICE_NAME
 ENV APP_MAIN_FILE=src/apps/$SERVICE_NAME/main
-
 CMD node $APP_MAIN_FILE
+#######################

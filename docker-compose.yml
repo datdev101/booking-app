@@ -1,3 +1,6 @@
+### THIS DOCKER COMPOSE IS USED FOR LOCAL DEVELOPMENT ###
+## If you want to use production image, comment volumes section in each services
+
 services:
   api-gateway:
     build:
@@ -5,7 +8,7 @@ services:
       dockerfile: Dockerfile
       args:
         - SERVICE_NAME=api-gateway
-      target: production
+      target: $RUN_MODE
     environment:
       - APP_ENV=$APP_ENV
       - APP_PORT=$APP_PORT
@@ -13,6 +16,9 @@ services:
       - RABBIT_MQ_AUTH_QUEUE=$RABBIT_MQ_AUTH_QUEUE
       - RABBIT_MQ_CONCERT_QUEUE=$RABBIT_MQ_CONCERT_QUEUE
       - RABBIT_MQ_BOOKING_QUEUE=$RABBIT_MQ_BOOKING_QUEUE
+    restart: unless-stopped
+    volumes:
+      - .:/app/
     ports:
       - $APP_PORT:$APP_PORT
     networks:
@@ -29,7 +35,7 @@ services:
       dockerfile: Dockerfile
       args:
         - SERVICE_NAME=auth-service
-      target: production
+      target: $RUN_MODE
     environment:
       - APP_ENV=$APP_ENV
       - RABBIT_MQ_URI=$RABBIT_MQ_URI
@@ -37,6 +43,9 @@ services:
       - MONGODB_URI=$MONGODB_URI
       - JWT_EXPIRE=$JWT_EXPIRE
       - JWT_SECRET=$JWT_SECRET
+    restart: unless-stopped
+    volumes:
+      - .:/app/
     networks:
       - api-gateway
       - mongodb
@@ -51,7 +60,7 @@ services:
       dockerfile: Dockerfile
       args:
         - SERVICE_NAME=concert-service
-      target: production
+      target: $RUN_MODE
     environment:
       - APP_ENV=$APP_ENV
       - RABBIT_MQ_URI=$RABBIT_MQ_URI
@@ -59,6 +68,9 @@ services:
       - MONGODB_URI=$MONGODB_URI
       - REDIS_HOST=$REDIS_HOST
       - REDIS_PORT=$REDIS_PORT
+    restart: unless-stopped
+    volumes:
+      - .:/app/
     networks:
       - api-gateway
       - mongodb
@@ -73,7 +85,7 @@ services:
       dockerfile: Dockerfile
       args:
         - SERVICE_NAME=booking-service
-      target: production
+      target: $RUN_MODE
     environment:
       - APP_ENV=dev
       - RABBIT_MQ_URI=$RABBIT_MQ_URI
@@ -82,6 +94,9 @@ services:
       - RABBIT_MQ_CONCERT_QUEUE=$RABBIT_MQ_CONCERT_QUEUE
       - REDIS_HOST=$REDIS_HOST
       - REDIS_PORT=$REDIS_PORT
+    restart: unless-stopped
+    volumes:
+      - .:/app/
     networks:
       - api-gateway
       - mongodb
