@@ -1,4 +1,4 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory, Virtual } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { SeatType, SeatTypeSchema } from './seat-type.schema';
 
@@ -11,10 +11,17 @@ export class Concert extends Document {
   date: Date;
 
   @Prop({ default: false })
-  isActivated: boolean;
+  isActive: boolean;
 
   @Prop({ type: [SeatTypeSchema], default: [] })
   seatTypes: SeatType[];
+
+  @Virtual({
+    get: function (this: Concert) {
+      return this._id;
+    },
+  })
+  concertId: string;
 }
 
 export const ConcertSchema = SchemaFactory.createForClass(Concert);

@@ -9,6 +9,7 @@ import { sendEventRmq } from '@app/common/helper';
 import { Body, Controller, Inject, Post, Res } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
+import { ApiOkResponse } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthService, Public } from './auth.constant';
 import { LoginReqDto, RegisterReqDto } from './dto/req.dto';
@@ -20,6 +21,7 @@ export class AuthController {
 
   @Public()
   @Post('register')
+  @ApiOkResponse({ type: RegisterResDto })
   async register(@Body() payload: RegisterReqDto) {
     await sendEventRmq<IRegisterReq, IRegisterRes>(
       this.authService,
@@ -31,6 +33,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
+  @ApiOkResponse({ type: LoginResDto })
   async login(
     @Body() payload: LoginReqDto,
     @Res({ passthrough: true }) res: Response,

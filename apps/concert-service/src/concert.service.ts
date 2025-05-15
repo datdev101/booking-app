@@ -1,7 +1,9 @@
 import { throwRpcError } from '@app/common/helper';
 import {
   IGetAllConcertReq,
+  IGetAllConcertRes,
   IGetByIdConcertReq,
+  IGetByIdConcertRes,
 } from '@app/common/interfaces/concert.interface';
 import { RedisService } from '@app/redis';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
@@ -20,14 +22,16 @@ export class ConcertService {
   getAll(dto: IGetAllConcertReq) {
     return this.concertModel
       .find(dto)
-      .select('_id name date isActivated')
+      .select('_id name date isActive')
+      .lean<IGetAllConcertRes['data']>()
       .exec();
   }
 
   async getById(dto: IGetByIdConcertReq) {
     return this.concertModel
       .findById(dto.id)
-      .select('_id name date isActivated seatTypes')
+      .select('_id name date isActive seatTypes')
+      .lean<IGetByIdConcertRes>()
       .exec();
   }
 

@@ -4,10 +4,10 @@ export interface IGetAllConcertReq {
 
 export interface IGetAllConcertRes {
   data: {
-    id: string;
+    _id: string;
     name: string;
     date: Date;
-    isActivated: boolean;
+    isActive: boolean;
   }[];
 }
 
@@ -16,7 +16,7 @@ export interface IGetByIdConcertReq {
 }
 
 export interface IGetByIdConcertRes {
-  id: string;
+  _id: string;
   name: string;
   date: Date;
   isActivated: boolean;
@@ -25,6 +25,7 @@ export interface IGetByIdConcertRes {
       type: string;
       totalTickets: number;
       remainingTickets: number;
+      _id: string;
     },
   ];
 }
