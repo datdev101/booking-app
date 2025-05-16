@@ -34,10 +34,10 @@ export class ConcertController {
   }
 
   @MessagePattern(MESSAGE_PATTERN.CONCERT.GET_BY_ID)
-  getById(
+  async getById(
     @Payload() payload: IGetByIdConcertReq,
     @Ctx() context: RmqContext,
-  ): Promise<IGetByIdConcertRes | null> {
+  ): Promise<IGetByIdConcertRes> {
     ackRmq(context);
     return this.concertService.getById(payload);
   }

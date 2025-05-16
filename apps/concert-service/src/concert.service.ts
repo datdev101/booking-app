@@ -6,7 +6,12 @@ import {
   IGetByIdConcertRes,
 } from '@app/common/interfaces/concert.interface';
 import { RedisService } from '@app/redis';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Redis } from 'ioredis';
 import { Model } from 'mongoose';
@@ -28,11 +33,13 @@ export class ConcertService {
   }
 
   async getById(dto: IGetByIdConcertReq) {
-    return this.concertModel
+    const concert = await this.concertModel
       .findById(dto.id)
       .select('_id name date isActive seatTypes')
-      .lean<IGetByIdConcertRes>()
+      .lean<IGetByIdConcertRes | null>()
       .exec();
+    if (!concert) throwRpcError(new NotFoundException('Concert id not exist'));
+    return concert;
   }
 
   async getAvailableSeats(dto: { concertId: string; seatTypeId: string }) {

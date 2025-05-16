@@ -10,7 +10,7 @@ import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ConcertService } from './concert.constant';
 import { GetAllConcertReq, GetByIdConcertReq } from './dto/req.dto';
-import { GetAllConcertResDto } from './dto/res.dto';
+import { GetAllConcertResDto, GetByIdConcertResDataDto } from './dto/res.dto';
 
 @Controller('concerts')
 export class ConcertController {
@@ -35,6 +35,6 @@ export class ConcertController {
       MESSAGE_PATTERN.CONCERT.GET_BY_ID,
       { id },
     );
-    return result;
+    return new GetByIdConcertResDataDto(result);
   }
 }

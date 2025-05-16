@@ -19,12 +19,12 @@ export interface IGetByIdConcertRes {
   _id: string;
   name: string;
   date: Date;
-  isActivated: boolean;
+  isActive: boolean;
   seatTypes: [
     {
-      type: string;
-      totalTickets: number;
-      remainingTickets: number;
+      type: 'vip' | 'regular' | 'standing';
+      totalSeats: number;
+      availableSeats: number;
       _id: string;
     },
   ];
