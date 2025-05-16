@@ -2,6 +2,7 @@ import { AppConfigModule, AppConfigService } from '@app/app-config';
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { EnvVar } from '../../config/env';
+import { AuthModule } from '../auth/auth.module';
 import { BookingService } from './booking.constant';
 import { BookingController } from './booking.controller';
 
@@ -25,6 +26,7 @@ import { BookingController } from './booking.controller';
         }),
       },
     ]),
+    AuthModule,
   ],
 })
 export class BookingModule {}

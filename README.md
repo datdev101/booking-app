@@ -113,8 +113,6 @@ The application exposes the following RESTful API endpoints:
 - API to fetch all available concerts  
 - API to fetch concert details  
 - API to book a seat for a concert  
-
-## 🔄 In Progress
 - Support multiple bookings per user for the same concert  
 - Prevent overbooking under high concurrency  
 

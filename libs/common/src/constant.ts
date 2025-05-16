@@ -26,4 +26,9 @@ export const MESSAGE_PATTERN = {
       cmd: 'update-available-seats-in-seat-type-of-concert',
     },
   },
+  BOOKING: {
+    CREATE_BOOKING: {
+      cmd: 'create-booking',
+    },
+  },
 } satisfies Record<string, Record<string, IPattern>>;

@@ -30,12 +30,21 @@ export interface IGetByIdConcertRes {
   ];
 }
 
-export interface IGetAvailableSeatsReq {
+export interface IGetAvailableSeatTypeReq {
   concertId: string;
   seatTypeId: string;
+}
+
+export interface IGetAvailableSeatTypeRes {
+  availableSeat: number;
 }
 
 export interface IUpdateAvailableSeatsReq {
   concertId: string;
   seatTypeId: string;
+  amount: number;
+}
+
+export interface IUpdateAvailableSeatsRes {
+  success: boolean;
 }
