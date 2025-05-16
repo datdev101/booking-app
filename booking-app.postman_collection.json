@@ -46,7 +46,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"user2@email.com\",\r\n    \"password\": \"123456\"\r\n}",
+							"raw": "{\r\n    \"email\": \"user1@email.com\",\r\n    \"password\": \"123456\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -140,14 +140,13 @@
 						"header": [
 							{
 								"key": "Cookie",
-								"value": "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MjQwY2MzMGI2YjM1NzVhMDQzNjBiNyIsImVtYWlsIjoidXNlcjJAZW1haWwuY29tIiwiaWF0IjoxNzQ3MTkzMDYyLCJleHAiOjE3NDgyNzMwNjJ9.GNIml_XuGjJh6tlFQcqDsiPxBZU9uLmVWWiSYDwBjyQ",
-								"type": "text",
-								"disabled": true
+								"value": "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MjQzZDlkOWY4YjVjNzgzYmM5YjNhMSIsImVtYWlsIjoidXNlcjJAZW1haWwuY29tIiwiaWF0IjoxNzQ3MzgyMTc3LCJleHAiOjE3NDg0NjIxNzd9.DH4GYclycxQucBGFxfo0iMaO1Qh-_mfnCE0LEM9DSNw",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"userId\": \"68243d9d9f8b5c783bc9b39f\",\r\n    \"concertId\": \"68243d9df6589b3675d1417c\", \r\n    \"seatTypeId\": \"68243d9df6589b3675d1417d\"\r\n}",
+							"raw": "{\r\n    \"concertId\": \"68243d9df6589b3675d1417c\", \r\n    \"seatTypeId\": \"68243d9df6589b3675d1417d\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

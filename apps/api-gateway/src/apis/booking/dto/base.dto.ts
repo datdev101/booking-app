@@ -1,12 +1,12 @@
 import { IsDate, IsEnum, IsMongoId, ValidateIf } from 'class-validator';
 
-enum SeatType {
+export enum SeatType {
   VIP = 'vip',
   REGULAR = 'regular',
   STANDING = 'standing',
 }
 
-enum Status {
+export enum Status {
   CONFIRMED = 'confirmed',
   CANCELLED = 'canceled',
 }

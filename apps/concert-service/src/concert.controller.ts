@@ -3,7 +3,7 @@ import { ackRmq } from '@app/common/helper';
 import {
   IGetAllConcertReq,
   IGetAllConcertRes,
-  IGetAvailableSeatsReq,
+  IGetAvailableSeatTypeReq,
   IGetByIdConcertReq,
   IGetByIdConcertRes,
   IUpdateAvailableSeatsReq,
@@ -44,7 +44,7 @@ export class ConcertController {
 
   @MessagePattern(MESSAGE_PATTERN.CONCERT.GET_AVAILABLE_SEATS)
   getAvailableSeats(
-    @Payload() payload: IGetAvailableSeatsReq,
+    @Payload() payload: IGetAvailableSeatTypeReq,
     @Ctx() context: RmqContext,
   ) {
     ackRmq(context);

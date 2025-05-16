@@ -2,8 +2,12 @@ import { throwRpcError } from '@app/common/helper';
 import {
   IGetAllConcertReq,
   IGetAllConcertRes,
+  IGetAvailableSeatTypeReq,
+  IGetAvailableSeatTypeRes,
   IGetByIdConcertReq,
   IGetByIdConcertRes,
+  IUpdateAvailableSeatsReq,
+  IUpdateAvailableSeatsRes,
 } from '@app/common/interfaces/concert.interface';
 import { RedisService } from '@app/redis';
 import {
@@ -42,39 +46,57 @@ export class ConcertService {
     return concert;
   }
 
-  async getAvailableSeats(dto: { concertId: string; seatTypeId: string }) {
-    const key = `concert:${dto.concertId}:seatType:${dto.seatTypeId}`;
-    const availableSeats = await this.redisService.get(key);
+  async getAvailableSeats(
+    dto: IGetAvailableSeatTypeReq,
+  ): Promise<IGetAvailableSeatTypeRes> {
+    const { concertId, seatTypeId } = dto;
+    const cacheKey = this.getAvailableSeatCacheKey(dto);
 
-    if (availableSeats !== null) return Number(availableSeats);
+    const cachedSeats = await this.redisService.get(cacheKey);
+    if (cachedSeats !== null) {
+      return { availableSeat: Number(cachedSeats) };
+    }
 
-    const result = await this.concertModel
-      .findOne({
-        _id: dto.concertId,
-        'seatTypes._id': dto.seatTypeId,
-      })
+    const concert = await this.concertModel
+      .findOne({ _id: concertId, 'seatTypes._id': seatTypeId })
       .select('seatTypes.$')
       .exec();
 
-    if (result == null || result.seatTypes.length == 0) {
+    if (!concert?.seatTypes?.length) {
       throwRpcError(new BadRequestException('Invalid id'));
     }
 
-    const seats = result.seatTypes[0].availableSeats;
-    await this.redisService.set(key, seats);
+    const availableSeat = concert.seatTypes[0].availableSeats;
+    await this.redisService.set(cacheKey, availableSeat);
 
-    return seats;
+    return { availableSeat };
   }
 
-  async updateAvailableSeats(dto: { concertId: string; seatTypeId: string }) {
-    return this.concertModel.findOneAndUpdate(
+  async updateAvailableSeats(
+    dto: IUpdateAvailableSeatsReq,
+  ): Promise<IUpdateAvailableSeatsRes> {
+    await this.concertModel.findOneAndUpdate(
       {
         _id: dto.concertId,
         'seatTypes._id': dto.seatTypeId,
       },
       {
-        $inc: { 'seatTypes.$.availableSeats': -1 },
+        'seatTypes.$.availableSeats': dto.amount,
+      },
+      {
+        new: true,
       },
     );
+    await this.redisService.set(this.getAvailableSeatCacheKey(dto), dto.amount);
+    return {
+      success: true,
+    };
+  }
+
+  private getAvailableSeatCacheKey(dto: {
+    concertId: string;
+    seatTypeId: string;
+  }) {
+    return `concert:${dto.concertId}:seatType:${dto.seatTypeId}`;
   }
 }

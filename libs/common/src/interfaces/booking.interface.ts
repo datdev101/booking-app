@@ -5,7 +5,7 @@ export interface ICreateBookingReq {
 }
 
 export interface ICreateBookingRes {
-  id: string;
+  _id: string;
   userId: string;
   concertId: string;
   seatTypeId: string;
